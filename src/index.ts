@@ -3,6 +3,7 @@ import cluster from "node:cluster";
 import { cpus } from "node:os";
 import process from "node:process";
 import { program } from "commander";
+import { app } from "./controller/server";
 
 const totalCPU = cpus().length;
 
@@ -71,17 +72,5 @@ if (cluster.isWorker == false) {
         cluster.fork();
     });
 } else {
-
-    // console.log('Arguments received:');
-
-    // console.log('Performance Mode:', options.perf);
-
-    // console.log('Max File Size:', options.maxSize);
-
-    // console.log('Max Number of Files:', options.maxFiles);
-    // console.log(`Number of CPUs is ${totalCPU}`);
-    // console.log("Attempting to Start Server")
-
-
-
+    app(options.perf, options.maxFiles, options.maxSize)
 }

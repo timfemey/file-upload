@@ -5,6 +5,8 @@ import HyperExpress from "hyper-express"
 import helmet from "helmet"
 import { IncomingMessage, ServerResponse } from "node:http";
 import fileUpload from "express-fileupload"
+import { uploadToS3 } from "../helper/upload";
+import { randomUUID } from "node:crypto";
 
 
 function checkServerType(server: "express"): typeof expressInit;
@@ -36,17 +38,49 @@ function app(perf: boolean, filesLimits: number, fileSizeLimit: number) {
             })
         })
         server.use((req, res, next) => {
-            if (req.method == "PUT" || req.method == "POST") {
+            if (req.method == "POST") {
                 next()
             } else {
                 res.status(400).json({ message: "Invalid Method , Only PUT and POST methods allowed and file name should be `file` " })
             }
+
+        })
+
+        server.post("/file", (req, res) => {
+            req.multipart({ limits: { files: filesLimits, fileSize: fileSizeLimit }, headers: { "content-type": req.headers["content-type"] } }, async (field) => {
+                if (field.name == "file") {
+                    const randomName = randomUUID()
+                    //@ts-ignore
+                    const url = uploadToS3(randomName, field.file.stream)
+                    res.json({ data: url, status: true })
+
+                } else {
+                    res.json({ message: "No File received, Check Multipart Field Name is specified as `file`", status: false });
+                }
+            })
         })
 
     } else {
         const server = checkServerType("express")
         server.use(helmet())
+        server.use((req, res, next) => {
+            if (req.method == "POST") {
+                next()
+            } else {
+                res.status(400).json({ message: "Invalid Method , Only PUT and POST methods allowed and file name should be `file` " })
+            }
+
+        })
         server.use(fileUpload({ abortOnLimit: true, limits: { fileSize: fileSizeLimit, files: filesLimits } }))
+        server.post("/file", (req, res) => {
+            //@ts-ignore
+            const file = req.files.file.data
+            const randomName = randomUUID()
+            //@ts-ignore
+            const url = uploadToS3(randomName, file)
+            res.json({ data: url, status: true })
+
+        })
     }
 
 
