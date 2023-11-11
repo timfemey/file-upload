@@ -12,18 +12,20 @@ const s3 = new aws.S3()
 
 const bucketName = process.env.BUCKET_NAME as string
 
-function uploadToS3(fileName: string, fileBody: aws.S3.Body | undefined) {
+function uploadToS3(fileName: string, fileBody: aws.S3.Body | undefined): string {
     const uploadParams = {
         Bucket: bucketName,
         Key: fileName,
         Body: fileBody,
     }
-
-    s3.upload(uploadParams, (err: any) => {
+    let a: string = "";
+    s3.upload(uploadParams, (err: any, data: aws.S3.ManagedUpload.SendData) => {
         if (err) {
             console.error('Error uploading file to S3:', err);
         }
+        a = data.Location;
     })
+    return a
 }
 
 export { uploadToS3 }
