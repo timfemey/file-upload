@@ -1,9 +1,11 @@
 # Ensure to define the following keys in your .env file
 
-## REGION
+## PORT - For Server port
 
-## SECRET_ACCESS_KEY
+## REGION - AWS Region
 
-## ACCESS_KEY_ID
+## SECRET_ACCESS_KEY - AWS Secret Access key
 
-## BUCKET_NAME
+## ACCESS_KEY_ID - AWS Access key ID
+
+## BUCKET_NAME - AWS Bucket Name

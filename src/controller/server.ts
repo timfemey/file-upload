@@ -59,6 +59,9 @@ function app(perf: boolean, filesLimits: number, fileSizeLimit: number) {
                 }
             })
         })
+        server.listen(Number(process.env.PORT as string)).then(() => {
+            console.log("Server Started at Port " + Number(process.env.PORT as string))
+        })
 
     } else {
         const server = checkServerType("express")
@@ -80,6 +83,9 @@ function app(perf: boolean, filesLimits: number, fileSizeLimit: number) {
             const url = uploadToS3(randomName, file)
             res.json({ data: url, status: true })
 
+        })
+        server.listen(process.env.PORT, () => {
+            console.log("Server Started at Port " + Number(process.env.PORT as string))
         })
     }
 
